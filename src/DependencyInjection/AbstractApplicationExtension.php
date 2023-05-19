@@ -64,8 +64,6 @@ abstract class AbstractApplicationExtension extends Extension
 
 	private function setContainerParamsRecursive(array $configValues, array $configStructure): void
 	{
-		$paramNamePrefix = $this->getAlias() . $this->pathSeparator;
-
 		foreach( $configValues as $key => $value ) {
 			if( is_array($configStructure[$key]) ) {
 				if( is_array($value) ) {
@@ -74,7 +72,7 @@ abstract class AbstractApplicationExtension extends Extension
 					throw new \UnexpectedValueException(sprintf('Found non-array value for array node "%s" of configuration tree.', $key));
 				}
 			} else {
-				$this->containerBuilder->setParameter($paramNamePrefix . $configStructure[$key], $value);
+				$this->containerBuilder->setParameter($configStructure[$key], $value);
 			}
 		}
 	}
