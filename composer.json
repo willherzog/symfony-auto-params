@@ -1,0 +1,26 @@
+{
+	"name": "willherzog/symfony-auto-params",
+	"description": "Provides automatic conversion of config values into container parameters.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Will Herzog",
+            "email": "willherzog@gmail.com"
+        }
+    ],
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/willherzog/php-util"
+		}
+	],
+    "require": {
+		"php": "^8.1",
+		"symfony/framework-bundle": "^6.2",
+		"willherzog/php-util": "dev-main"
+	},
+    "autoload": {
+        "psr-4": { "WHSymfony\\": "src/" }
+    }
+}
