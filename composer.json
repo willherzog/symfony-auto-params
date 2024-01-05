@@ -16,8 +16,8 @@
 		}
 	],
     "require": {
-		"php": "^8.1",
-		"symfony/framework-bundle": "^6.2",
+		"php": "^8.2",
+		"symfony/framework-bundle": "^6.2|^7.0",
 		"willherzog/php-util": "dev-main"
 	},
     "autoload": {
