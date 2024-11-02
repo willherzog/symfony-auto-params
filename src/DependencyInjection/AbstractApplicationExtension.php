@@ -39,7 +39,7 @@ abstract class AbstractApplicationExtension extends Extension
 
 	private function parseConfigTreeRecursive(NodeInterface $configTree, array &$parentStructure, int $paramDepth = 0): void
 	{
-		if( !get_class($configTree) === ArrayNode::class ) {
+		if( !$configTree instanceof ArrayNode ) {
 			return;
 		}
 
