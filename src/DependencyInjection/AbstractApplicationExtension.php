@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
-use WHTwig\Bundle\WHTwigSymfonyBundle\Config\Definition\ConfigDefinitionAttributes;
+use WHSymfony\Config\Definition\ConfigDefinitionAttributes;
 
 /**
  * An abstract container extension which converts merged config values into container parameters automatically.
