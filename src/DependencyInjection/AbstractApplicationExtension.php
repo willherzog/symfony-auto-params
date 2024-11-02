@@ -7,6 +7,8 @@ use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
+use WHTwig\Bundle\WHTwigSymfonyBundle\Config\Definition\ConfigDefinitionAttributes;
+
 /**
  * An abstract container extension which converts merged config values into container parameters automatically.
  *
@@ -48,7 +50,14 @@ abstract class AbstractApplicationExtension extends Extension
 		}
 
 		foreach( $configTree->getChildren() as $node ) {
-			if( ($node instanceof ArrayNode) && !($node instanceof PrototypedArrayNode) && $paramDepth <= $this->maxParamDepth ) {
+			if(
+				$node instanceof ArrayNode
+				&& $paramDepth <= $this->maxParamDepth
+				&& (
+					!$node instanceof PrototypedArrayNode
+					|| $node->getAttribute(ConfigDefinitionAttributes::FORCE_CREATE_AUTO_PARAM, false)
+				)
+			) {
 				$childStructure = [];
 
 				$this->parseConfigTreeRecursive($node, $childStructure, $paramDepth);
