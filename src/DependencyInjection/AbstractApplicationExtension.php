@@ -111,8 +111,6 @@ abstract class AbstractApplicationExtension extends Extension
 					$numSearchOccurrences = substr_count($finalParamName, $search);
 
 					if( $numSearchOccurrences !== $numPrototypeKeys ) {
-						dump($prototypeKeys);
-						dd($finalParamName);
 						throw new \RangeException(sprintf('Prototype discrepancy (%d vs. %d) found in path for node "%s" of configuration tree.', $numSearchOccurrences, $numPrototypeKeys, $key));
 					}
 
