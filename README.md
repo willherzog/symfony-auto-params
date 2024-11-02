@@ -14,7 +14,7 @@
 
 // Configuration.php
 
-use WHTwig\Bundle\WHTwigSymfonyBundle\Config\Definition\ConfigDefinitionAttributes;
+use WHSymfony\Config\Definition\ConfigDefinitionAttributes;
 
 /* ... */
         ->arrayPrototype()

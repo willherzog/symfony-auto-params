@@ -1,6 +1,6 @@
 <?php
 
-namespace WHTwig\Bundle\WHTwigSymfonyBundle\Config\Definition;
+namespace WHSymfony\Config\Definition;
 
 /**
  * @author Will Herzog <willherzog@gmail.com>
