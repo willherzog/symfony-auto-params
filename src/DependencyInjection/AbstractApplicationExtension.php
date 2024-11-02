@@ -16,11 +16,13 @@ use WHSymfony\Config\Definition\ConfigDefinitionAttributes;
  */
 abstract class AbstractApplicationExtension extends Extension
 {
+	private const PROTOTYPE_ARRAY_NODE = '__prototype_array_node__';
+
 	private ContainerBuilder $containerBuilder;
 	private array $configurationStructure = [];
 
 	final public function __construct(
-		private readonly int $maxParamDepth = 3, // Prevent parameters being created beyond this depth
+		private readonly int $maxParamDepth = 3,
 		private readonly string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR
 	) {}
 
@@ -55,31 +57,72 @@ abstract class AbstractApplicationExtension extends Extension
 				&& $paramDepth <= $this->maxParamDepth
 				&& (
 					!$node instanceof PrototypedArrayNode
-					|| $node->getAttribute(ConfigDefinitionAttributes::FORCE_CREATE_AUTO_PARAM, false)
+					|| (
+						($nodePrototype = $node->getPrototype()) instanceof ArrayNode
+						&& $nodePrototype->getAttribute(ConfigDefinitionAttributes::FORCE_CREATE_AUTO_PARAM)
+					)
 				)
 			) {
-				$childStructure = [];
+				$nodeStructure = [];
 
-				$this->parseConfigTreeRecursive($node, $childStructure, $paramDepth);
+				if( $node instanceof PrototypedArrayNode ) {
+					$this->parseConfigTreeRecursive($nodePrototype, $nodeStructure, $paramDepth);
 
-				$parentStructure[$node->getName()] = $childStructure;
+					$parentStructure[$node->getName()] = [self::PROTOTYPE_ARRAY_NODE => $nodeStructure];
+				} else {
+					$this->parseConfigTreeRecursive($node, $nodeStructure, $paramDepth);
+
+					$parentStructure[$node->getName()] = $nodeStructure;
+				}
 			} else {
 				$parentStructure[$node->getName()] = $node->getPath();
 			}
 		}
 	}
 
-	private function setContainerParamsRecursive(array $configValues, array $configStructure): void
+	private function setContainerParamsRecursive(array $configValues, array $configStructure, array $prototypeKeys = []): void
 	{
 		foreach( $configValues as $key => $value ) {
-			if( is_array($configStructure[$key]) ) {
+			if( key_exists($key, $configStructure) ) {
+				$thisConfigStructure = $configStructure[$key];
+				$prototypeKeysMerge = [];
+			} elseif( key_exists(self::PROTOTYPE_ARRAY_NODE, $configStructure) ) {
+				$thisConfigStructure = $configStructure[self::PROTOTYPE_ARRAY_NODE];
+				$prototypeKeysMerge = [$key];
+			} else {
+				throw new \OutOfBoundsException(sprintf('No matching definition found for node "%s" of configuration tree.', $key));
+			}
+
+			if( is_array($thisConfigStructure) ) {
 				if( is_array($value) ) {
-					$this->setContainerParamsRecursive($value, $configStructure[$key]);
+					$this->setContainerParamsRecursive($value, $thisConfigStructure, array_merge($prototypeKeys, $prototypeKeysMerge));
 				} else {
 					throw new \UnexpectedValueException(sprintf('Found non-array value for array node "%s" of configuration tree.', $key));
 				}
 			} else {
-				$this->containerBuilder->setParameter($configStructure[$key], $value);
+				$finalParamName = $thisConfigStructure;
+
+				if( $prototypeKeys !== [] ) {
+					if( !isset($numPrototypeKeys) ) {
+						$numPrototypeKeys = count($prototypeKeys);
+					}
+
+					$search = $this->pathSeparator . $this->pathSeparator;
+					$numSearchOccurrences = substr_count($finalParamName, $search);
+
+					if( $numSearchOccurrences !== $numPrototypeKeys ) {
+						dump($prototypeKeys);
+						dd($finalParamName);
+						throw new \RangeException(sprintf('Prototype discrepancy (%d vs. %d) found in path for node "%s" of configuration tree.', $numSearchOccurrences, $numPrototypeKeys, $key));
+					}
+
+					do {
+						$replacement = $this->pathSeparator . array_shift($prototypeKeys) . $this->pathSeparator;
+						$finalParamName = substr_replace($finalParamName, $replacement, strpos($finalParamName, $search), strlen($search));
+					} while( str_contains($finalParamName, $search) && $prototypeKeys !== [] );
+				}
+
+				$this->containerBuilder->setParameter($finalParamName, $value);
 			}
 		}
 	}
