@@ -3,11 +3,9 @@
 namespace WHSymfony\DependencyInjection;
 
 use Symfony\Component\Config\Definition\{ArrayNode,BaseNode,PrototypedArrayNode};
-use Symfony\Component\Config\Definition\{ConfigurationInterface,NodeInterface};
+use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
-
-use WHPHP\Util\ArrayUtil;
 
 /**
  * An abstract container extension which converts merged config values into container parameters automatically.
