@@ -114,10 +114,12 @@ abstract class AbstractApplicationExtension extends Extension
 						throw new \RangeException(sprintf('Prototype discrepancy (%d vs. %d) found in path for node "%s" of configuration tree.', $numSearchOccurrences, $numPrototypeKeys, $key));
 					}
 
+					$prototypeKeysClone = $prototypeKeys;
+
 					do {
-						$replacement = $this->pathSeparator . array_shift($prototypeKeys) . $this->pathSeparator;
+						$replacement = $this->pathSeparator . array_shift($prototypeKeysClone) . $this->pathSeparator;
 						$finalParamName = substr_replace($finalParamName, $replacement, strpos($finalParamName, $search), strlen($search));
-					} while( str_contains($finalParamName, $search) && $prototypeKeys !== [] );
+					} while( str_contains($finalParamName, $search) && $prototypeKeysClone !== [] );
 				}
 
 				$this->containerBuilder->setParameter($finalParamName, $value);
