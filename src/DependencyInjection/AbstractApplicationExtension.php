@@ -52,6 +52,7 @@ abstract class AbstractApplicationExtension extends Extension
 		}
 
 		foreach( $configTree->getChildren() as $node ) {
+			/** @var ArrayNode $nodePrototype */
 			if(
 				$node instanceof ArrayNode
 				&& $paramDepth <= $this->maxParamDepth
