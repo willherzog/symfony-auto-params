@@ -36,9 +36,28 @@ abstract class AbstractApplicationExtension extends Extension
 		$configTree = $configuration->getConfigTreeBuilder()->buildTree();
 		$mergedConfig = $this->processConfiguration($configuration, $configs);
 
+		// Optional extension hook - see method description below
+		$mergedConfig = $this->loadServicesWithMergedConfig($mergedConfig, $containerBuilder);
+
 		$this->parseConfigTreeRecursive($configTree, $this->configurationStructure);
 
 		$this->setContainerParamsRecursive($mergedConfig, $this->configurationStructure);
+	}
+
+	/**
+	 * Override this method in order to configure services manually using some of the merged config values.
+	 *
+	 * Unless the intention is for any such config values to also be used as container parameters,
+	 * remove them from the `$mergedConfig` array before returning it.
+	 *
+	 * Access the {@link ContainerBuilder} instance using `$this->containerBuilder`.
+	 *
+	 * @see https://symfony.com/doc/current/components/dependency_injection.html
+	 */
+	protected function loadServicesWithMergedConfig(array $mergedConfig): array
+	{
+		// Always return the $mergedConfig array
+		return $mergedConfig;
 	}
 
 	private function parseConfigTreeRecursive(NodeInterface $configTree, array &$parentStructure, int $paramDepth = 0): void
